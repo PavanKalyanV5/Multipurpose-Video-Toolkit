@@ -9,6 +9,14 @@ export default defineManifest({
     'Hover controls for any video, any site: speed, seek, rotate, cinema mode, PiP, fullscreen, screenshot, record, volume boost with an 8-band EQ, captions, downloads, subtitles, and a local usage dashboard. Plus per-site custom CSS/JS injection with a full code editor. Off by default — enable per site from the popup.',
   permissions: ['downloads', 'storage', 'webRequest', 'scripting', 'tabs', 'declarativeNetRequest'],
   host_permissions: ['<all_urls>'],
+  // 'unsafe-eval' here governs *our own* extension pages/service worker CSP
+  // only — it's what lets the background script construct custom per-site
+  // JS rules via `new Function(code)` before handing them to
+  // chrome.scripting.executeScript. It has no bearing on, and isn't
+  // weakened by, the CSP of whatever page the rule ends up running on.
+  content_security_policy: {
+    extension_pages: "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  },
   declarative_net_request: {
     rule_resources: [
       {

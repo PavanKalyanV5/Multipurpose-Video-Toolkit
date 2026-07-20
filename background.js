@@ -116,16 +116,30 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     // globals — exactly what a user-script-style rule is for. This is
     // inherently arbitrary code execution with full page privileges; the
     // rules page warns about that, this handler just does what it's told.
+    //
+    // Deliberately NOT `func: (code) => eval(code)`: that calls eval() as
+    // *page* code once injected, which is subject to the page's own CSP —
+    // sites that disallow 'unsafe-eval' (Instagram and most React/webpack
+    // bundled sites do) silently block every rule with zero visible error.
+    // Instead, the Function is constructed here, in the background script's
+    // own context (governed by *our* extension CSP, see manifest.json's
+    // 'unsafe-eval' allowance) — chrome.scripting.executeScript injects a
+    // function by re-parsing its source directly in the target world, which
+    // is exempt from the target page's CSP entirely.
     const tabId = sender.tab ? sender.tab.id : -1;
     if (tabId !== -1 && typeof msg.code === 'string') {
+      let userFn;
+      try {
+        userFn = new Function(msg.code);
+      } catch (e) {
+        console.error('[Universal Video Toolkit] Custom rule JS failed to parse:', e);
+        return;
+      }
       chrome.scripting.executeScript({
         target: { tabId, frameIds: [sender.frameId ?? 0] },
         world: 'MAIN',
-        func: (code) => {
-          try { (0, eval)(code); } catch (e) { console.error('[Universal Video Toolkit] Custom rule JS error:', e); }
-        },
-        args: [msg.code]
-      }).catch((e) => console.error(e));
+        func: userFn,
+      }).catch((e) => console.error('[Universal Video Toolkit] Custom rule JS error:', e));
     }
     return;
   }

@@ -27,6 +27,15 @@ export function BarTooltip({ target }: Props) {
     // Keep showing the outgoing label while this fades out, rather than
     // popping to blank text for the last frame of the exit transition.
     setLabel(target.getAttribute('aria-label') || '');
+    // A couple of buttons (e.g. the network-speed readout) embed a live value
+    // in their aria-label, so it keeps changing while you're hovering it —
+    // without this, the tooltip would freeze on whatever text it had at the
+    // instant it opened instead of tracking the button's actual label.
+    const observer = new MutationObserver(() => {
+      setLabel(target.getAttribute('aria-label') || '');
+    });
+    observer.observe(target, { attributes: true, attributeFilter: ['aria-label'] });
+    return () => observer.disconnect();
   }, [target]);
 
   useEffect(() => {
