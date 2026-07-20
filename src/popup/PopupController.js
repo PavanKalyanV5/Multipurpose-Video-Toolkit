@@ -44,6 +44,8 @@ export class PopupController {
       eqPresetBtns:   Array.from(document.querySelectorAll('.eq-preset-btn')),
       dashboardBtn:   document.getElementById('dashboardBtn'),
       rulesBtn:       document.getElementById('rulesBtn'),
+      sitesBtn:       document.getElementById('sitesBtn'),
+      manageSitesLink:document.getElementById('manageSitesLink'),
       popupVidSpeed:  document.getElementById('popupVidSpeed'),
       popupDevSpeed:  document.getElementById('popupDevSpeed'),
     };
@@ -345,6 +347,13 @@ export class PopupController {
     this.#els.rulesBtn?.addEventListener('click', () => {
       chrome.tabs.create({ url: chrome.runtime.getURL('rules.html') });
     });
+
+    // Manage Enabled Sites button
+    const openSitesManager = () => {
+      chrome.tabs.create({ url: chrome.runtime.getURL('dashboard.html#sites') });
+    };
+    this.#els.sitesBtn?.addEventListener('click', openSitesManager);
+    this.#els.manageSitesLink?.addEventListener('click', openSitesManager);
   }
 
   // ── Live state updates from content script ────────────────────────────────────

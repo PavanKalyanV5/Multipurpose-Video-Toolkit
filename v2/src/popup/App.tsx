@@ -279,6 +279,11 @@ export function App() {
           <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 500 }}>Control panel</Typography>
         </Box>
         <Stack direction="row" gap={0.75}>
+          <Tooltip title="View & manage enabled sites">
+            <IconButton size="small" onClick={() => chrome.tabs.create({ url: chrome.runtime.getURL('src/pages/dashboard/index.html#sites') })} sx={{ border: 1, borderColor: 'divider', bgcolor: 'action.hover' }}>
+              <PublicIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
           <Tooltip title="Custom CSS/JS rules per site">
             <IconButton size="small" onClick={() => chrome.tabs.create({ url: chrome.runtime.getURL('src/pages/rules/index.html') })} sx={{ border: 1, borderColor: 'divider', bgcolor: 'action.hover' }}>
               <CodeIcon fontSize="small" />

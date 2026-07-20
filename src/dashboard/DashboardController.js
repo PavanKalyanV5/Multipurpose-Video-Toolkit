@@ -35,6 +35,13 @@ class DashboardController {
       exportBtn:    document.getElementById('exportBtn'),
       importBtn:    document.getElementById('importBtn'),
       importFile:   document.getElementById('importFile'),
+      sitesSection:       document.getElementById('sitesSection'),
+      sitesBadge:         document.getElementById('sitesBadge'),
+      addSiteInput:       document.getElementById('addSiteInput'),
+      addSiteBtn:         document.getElementById('addSiteBtn'),
+      sitesSearch:        document.getElementById('sitesSearch'),
+      sitesListContainer: document.getElementById('sitesListContainer'),
+      clearSitesBtn:      document.getElementById('clearSitesBtn'),
     };
   }
 
@@ -44,6 +51,17 @@ class DashboardController {
     this.#els.exportBtn.addEventListener('click', () => this.#exportSettings());
     this.#els.importBtn.addEventListener('click', () => this.#els.importFile.click());
     this.#els.importFile.addEventListener('change', () => this.#importSettings());
+
+    this.#els.addSiteBtn?.addEventListener('click', () => this.#handleAddSite());
+    this.#els.addSiteInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') this.#handleAddSite(); });
+    this.#els.sitesSearch?.addEventListener('input', () => this.#loadEnabledSites());
+    this.#els.clearSitesBtn?.addEventListener('click', () => this.#handleClearSites());
+
+    if (window.location.hash === '#sites') {
+      setTimeout(() => {
+        this.#els.sitesSection?.scrollIntoView({ behavior: 'smooth' });
+      }, 200);
+    }
   }
 
   #exportSettings() {
@@ -87,6 +105,101 @@ class DashboardController {
 
   #load() {
     chrome.storage.local.get([STATS_KEY], (r) => this.#render(r[STATS_KEY]));
+    this.#loadEnabledSites();
+  }
+
+  #loadEnabledSites() {
+    chrome.storage.local.get(['uvtEnabledSites'], (r) => {
+      const sites = r.uvtEnabledSites || [];
+      this.#renderEnabledSitesList(sites);
+    });
+  }
+
+  #handleAddSite() {
+    const raw = this.#els.addSiteInput?.value || '';
+    let domain = raw.trim().toLowerCase();
+    if (!domain) return;
+    try {
+      if (domain.includes('://')) {
+        domain = new URL(domain).hostname;
+      } else {
+        domain = domain.split('/')[0].split('?')[0];
+      }
+    } catch {}
+
+    if (!domain) return;
+
+    chrome.storage.local.get(['uvtEnabledSites'], (r) => {
+      const sites = r.uvtEnabledSites || [];
+      if (!sites.includes(domain)) {
+        sites.push(domain);
+        chrome.storage.local.set({ uvtEnabledSites: sites }, () => {
+          this.#els.addSiteInput.value = '';
+          this.#loadEnabledSites();
+        });
+      }
+    });
+  }
+
+  #handleClearSites() {
+    if (!confirm('Remove all enabled sites from allowlist?')) return;
+    chrome.storage.local.set({ uvtEnabledSites: [] }, () => this.#loadEnabledSites());
+  }
+
+  #renderEnabledSitesList(sites) {
+    if (!this.#els.sitesListContainer) return;
+    const query = (this.#els.sitesSearch?.value || '').trim().toLowerCase();
+    const filtered = sites.filter((s) => s.toLowerCase().includes(query));
+
+    if (this.#els.sitesBadge) {
+      this.#els.sitesBadge.textContent = `${sites.length} site${sites.length === 1 ? '' : 's'}`;
+    }
+
+    this.#els.sitesListContainer.innerHTML = '';
+
+    if (!filtered.length) {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'grid-column: 1 / -1; color:#64748b; font-size:12px; padding:16px 0; text-align:center;';
+      empty.textContent = sites.length > 0 ? 'No matching sites found.' : 'No site-specific rules added yet. Toggle "Enabled on this site" in the popup or add domains above.';
+      this.#els.sitesListContainer.appendChild(empty);
+      return;
+    }
+
+    filtered.forEach((domain) => {
+      const item = document.createElement('div');
+      item.style.cssText = 'background:rgba(255,255,255,0.03); border:1px solid var(--surface-border); border-radius:10px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px;';
+
+      const left = document.createElement('div');
+      left.style.cssText = 'display:flex; align-items:center; gap:8px; overflow:hidden;';
+
+      const icon = document.createElement('span');
+      icon.style.cssText = 'color:#38bdf8; display:flex; align-items:center; flex-shrink:0;';
+      icon.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`;
+
+      const label = document.createElement('span');
+      label.style.cssText = 'font-size:12.5px; font-weight:600; color:var(--text-primary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;';
+      label.textContent = domain;
+
+      left.appendChild(icon);
+      left.appendChild(label);
+
+      const delBtn = document.createElement('button');
+      delBtn.style.cssText = 'background:none; border:none; color:#94a3b8; cursor:pointer; padding:4px; display:flex; align-items:center; border-radius:4px; transition:color .15s ease;';
+      delBtn.title = `Remove ${domain}`;
+      delBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`;
+      delBtn.addEventListener('mouseover', () => delBtn.style.color = '#ef4444');
+      delBtn.addEventListener('mouseout', () => delBtn.style.color = '#94a3b8');
+      delBtn.addEventListener('click', () => {
+        chrome.storage.local.get(['uvtEnabledSites'], (res) => {
+          const cur = (res.uvtEnabledSites || []).filter((s) => s !== domain);
+          chrome.storage.local.set({ uvtEnabledSites: cur }, () => this.#loadEnabledSites());
+        });
+      });
+
+      item.appendChild(left);
+      item.appendChild(delBtn);
+      this.#els.sitesListContainer.appendChild(item);
+    });
   }
 
   #render(stats) {

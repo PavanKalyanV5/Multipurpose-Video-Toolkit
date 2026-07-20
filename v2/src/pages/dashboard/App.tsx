@@ -7,10 +7,17 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+import Chip from '@mui/material/Chip';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
+import PublicIcon from '@mui/icons-material/Public';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
 import { BrandIcon } from '../../shared/BrandIcon';
 import { GradientText } from '../../shared/GradientText';
 import type { StatsShape, StorageShape } from '../../shared/types';
@@ -77,15 +84,54 @@ function KpiTile({ label, value, sub, big }: { label: string; value: string; sub
 
 export function App() {
   const [stats, setStats] = useState<StatsShape | null | undefined>(undefined); // undefined = loading
+  const [enabledSites, setEnabledSites] = useState<string[]>([]);
+  const [newSiteDomain, setNewSiteDomain] = useState('');
+  const [siteSearch, setSiteSearch] = useState('');
   const importInputRef = useRef<HTMLInputElement>(null);
+  const sitesCardRef = useRef<HTMLDivElement>(null);
 
   const load = () => {
-    chrome.storage.local.get([STATS_KEY], (r: StorageShape) => setStats(r.uvtStats || null));
+    chrome.storage.local.get([STATS_KEY, 'uvtEnabledSites'], (r: StorageShape) => {
+      setStats(r.uvtStats || null);
+      setEnabledSites(r.uvtEnabledSites || []);
+    });
   };
 
   useEffect(() => {
     load();
+    if (window.location.hash === '#sites') {
+      setTimeout(() => sitesCardRef.current?.scrollIntoView({ behavior: 'smooth' }), 300);
+    }
   }, []);
+
+  const addSite = () => {
+    let domain = newSiteDomain.trim().toLowerCase();
+    if (!domain) return;
+    try {
+      if (domain.includes('://')) domain = new URL(domain).hostname;
+      else domain = domain.split('/')[0].split('?')[0];
+    } catch {}
+    if (!domain) return;
+
+    if (!enabledSites.includes(domain)) {
+      const next = [...enabledSites, domain];
+      setEnabledSites(next);
+      chrome.storage.local.set({ uvtEnabledSites: next });
+      setNewSiteDomain('');
+    }
+  };
+
+  const removeSite = (domain: string) => {
+    const next = enabledSites.filter((s) => s !== domain);
+    setEnabledSites(next);
+    chrome.storage.local.set({ uvtEnabledSites: next });
+  };
+
+  const clearSites = () => {
+    if (!confirm('Clear all enabled sites from allowlist?')) return;
+    setEnabledSites([]);
+    chrome.storage.local.set({ uvtEnabledSites: [] });
+  };
 
   const resetStats = () => {
     if (!confirm('Reset all usage stats? This cannot be undone.')) return;
@@ -153,6 +199,8 @@ export function App() {
   const restTotal = actionEntries.slice(7).reduce((sum, [, c]) => sum + c, 0);
   if (restTotal > 0) actionsData.push({ label: 'Other', count: restTotal });
 
+  const filteredSites = enabledSites.filter((s) => s.toLowerCase().includes(siteSearch.trim().toLowerCase()));
+
   return (
     <Box sx={{ maxWidth: 980, mx: 'auto', p: { xs: 3, md: 5 } }}>
       <Stack direction="row" alignItems="center" justifyContent="space-between" gap={2} sx={{ mb: 3.5 }}>
@@ -160,7 +208,7 @@ export function App() {
           <BrandIcon sx={{ fontSize: 26, color: 'primary.main', filter: 'drop-shadow(0 0 8px rgba(56,189,248,.4))' }} />
           <Box>
             <GradientText variant="h5" sx={{ fontSize: 20 }}>Dashboard</GradientText>
-            <Typography variant="caption" sx={{ color: 'text.disabled' }}>Your Universal Video Toolkit usage, tracked locally on this device</Typography>
+            <Typography variant="caption" sx={{ color: 'text.disabled' }}>Your Universal Video Toolkit usage &amp; site settings, tracked locally</Typography>
           </Box>
         </Stack>
         <Button variant="outlined" color="inherit" startIcon={<RestartAltIcon fontSize="small" />} onClick={resetStats} sx={{ color: 'text.secondary', borderColor: 'divider' }}>
@@ -183,6 +231,68 @@ export function App() {
             </Button>
             <input ref={importInputRef} type="file" accept="application/json" hidden onChange={importSettings} />
           </Stack>
+        </CardContent>
+      </Card>
+
+      <Card ref={sitesCardRef} sx={{ mb: 2 }}>
+        <CardContent>
+          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+            <Stack direction="row" alignItems="center" gap={1}>
+              <PublicIcon sx={{ color: 'primary.main', fontSize: 18 }} />
+              <Typography variant="subtitle2" sx={{ fontSize: 11, color: '#78c8ff', textTransform: 'uppercase' }}>Enabled Sites Allowlist</Typography>
+            </Stack>
+            <Chip label={`${enabledSites.length} site${enabledSites.length === 1 ? '' : 's'}`} size="small" sx={{ bgcolor: 'rgba(56,189,248,0.15)', color: 'primary.main', fontWeight: 600 }} />
+          </Stack>
+
+          <Stack direction={{ xs: 'column', sm: 'row' }} gap={1.5} sx={{ mb: 2 }}>
+            <TextField
+              size="small"
+              placeholder="Add domain (e.g. youtube.com)"
+              value={newSiteDomain}
+              onChange={(e) => setNewSiteDomain(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') addSite(); }}
+              sx={{ flex: 1 }}
+            />
+            <Button variant="contained" size="small" startIcon={<AddIcon fontSize="small" />} onClick={addSite} sx={{ bgcolor: 'primary.main', color: '#0f172a', fontWeight: 700 }}>
+              Add Site
+            </Button>
+            <TextField
+              size="small"
+              placeholder="Search enabled sites..."
+              value={siteSearch}
+              onChange={(e) => setSiteSearch(e.target.value)}
+              InputProps={{ startAdornment: <SearchIcon fontSize="small" sx={{ color: 'text.disabled', mr: 0.5 }} /> }}
+              sx={{ width: { xs: '100%', sm: 220 } }}
+            />
+          </Stack>
+
+          {filteredSites.length === 0 ? (
+            <Typography variant="body2" sx={{ color: 'text.disabled', textAlign: 'center', py: 3 }}>
+              {enabledSites.length > 0 ? 'No matching sites found.' : 'No site-specific rules added yet. Toggle "Enabled on this site" in the popup or add domains above.'}
+            </Typography>
+          ) : (
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 1.25 }}>
+              {filteredSites.map((domain) => (
+                <Box key={domain} sx={{ p: 1.25, px: 1.75, borderRadius: 2, bgcolor: 'rgba(255,255,255,0.03)', border: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Stack direction="row" alignItems="center" gap={1} sx={{ overflow: 'hidden' }}>
+                    <PublicIcon sx={{ fontSize: 16, color: 'primary.main', flexShrink: 0 }} />
+                    <Typography variant="body2" fontWeight={600} noWrap>{domain}</Typography>
+                  </Stack>
+                  <IconButton size="small" color="inherit" onClick={() => removeSite(domain)} sx={{ color: 'text.disabled', '&:hover': { color: 'error.main' } }}>
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              ))}
+            </Box>
+          )}
+
+          {enabledSites.length > 0 && (
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+              <Button size="small" color="error" variant="outlined" onClick={clearSites} sx={{ fontSize: 11 }}>
+                Clear All Enabled Sites
+              </Button>
+            </Box>
+          )}
         </CardContent>
       </Card>
 

@@ -189,6 +189,29 @@
           <div class="card-title">Feature usage</div>
           <div id="actionsChart"></div>
         </div>
+      <!-- Feature: Enabled Sites Manager -->
+      <div class="card" id="sitesSection">
+        <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="display:flex;align-items:center;gap:8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            Enabled Sites Allowlist
+          </span>
+          <span id="sitesBadge" style="font-size:11px;font-weight:600;background:rgba(56,189,248,0.15);color:#38bdf8;padding:2px 8px;border-radius:12px;">0 sites</span>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+          <input type="text" id="addSiteInput" placeholder="Add domain (e.g. youtube.com)" style="flex:1;min-width:200px;background:rgba(255,255,255,0.04);border:1px solid var(--surface-border);color:var(--text-primary);padding:8px 12px;border-radius:8px;font-size:12px;">
+          <button id="addSiteBtn" style="background:#38bdf8;border:none;color:#0f172a;font-weight:700;padding:8px 16px;border-radius:8px;font-size:12px;cursor:pointer;">+ Add Site</button>
+          <input type="text" id="sitesSearch" placeholder="Search enabled sites..." style="width:200px;background:rgba(255,255,255,0.04);border:1px solid var(--surface-border);color:var(--text-primary);padding:8px 12px;border-radius:8px;font-size:12px;">
+        </div>
+
+        <div id="sitesListContainer" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));gap:10px;">
+          <!-- Dynamically populated site tiles -->
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;margin-top:16px;">
+          <button id="clearSitesBtn" style="background:none;border:1px solid rgba(239,68,68,0.3);color:#fca5a5;font-size:11.5px;padding:5px 12px;border-radius:6px;cursor:pointer;">Clear All Enabled Sites</button>
+        </div>
       </div>
     </div>
   </div>
