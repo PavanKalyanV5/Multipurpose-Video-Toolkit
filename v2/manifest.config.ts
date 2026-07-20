@@ -7,8 +7,17 @@ export default defineManifest({
   version: pkg.version,
   description:
     'Hover controls for any video, any site: speed, seek, rotate, cinema mode, PiP, fullscreen, screenshot, record, volume boost with an 8-band EQ, captions, downloads, subtitles, and a local usage dashboard. Plus per-site custom CSS/JS injection with a full code editor. Off by default — enable per site from the popup.',
-  permissions: ['downloads', 'storage', 'webRequest', 'scripting', 'tabs'],
+  permissions: ['downloads', 'storage', 'webRequest', 'scripting', 'tabs', 'declarativeNetRequest'],
   host_permissions: ['<all_urls>'],
+  declarative_net_request: {
+    rule_resources: [
+      {
+        id: 'timing_allow_origin_rules',
+        enabled: true,
+        path: 'dnr_rules.json',
+      },
+    ],
+  },
   background: {
     service_worker: 'src/background/index.ts',
     type: 'module',

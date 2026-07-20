@@ -172,6 +172,9 @@ button.active  {
 
 .sep { width: 1px; height: 16px; background: rgba(255,255,255,.08); margin: 0 2px; }
 
+#netSpeed { display: flex; align-items: center; gap: 4px; padding: 2px 7px; min-width: auto; font-size: 11px; }
+#netSpeedLabel { font-size: 11px; color: #38bdf8; font-weight: 600; white-space: nowrap; }
+
 #picker {
   position: fixed; display: none; flex-direction: column; gap: 4px;
   background: linear-gradient(135deg, rgba(10,12,18,.98) 0%, rgba(18,22,34,.98) 100%);

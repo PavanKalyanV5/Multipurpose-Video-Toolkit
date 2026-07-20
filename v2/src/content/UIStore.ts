@@ -21,7 +21,8 @@ export type FlashIconKey =
   | 'solo'
   | 'cinema'
   | 'normalize'
-  | 'eq';
+  | 'eq'
+  | 'netSpeed';
 
 export interface BarSync {
   rate: number;
@@ -34,6 +35,8 @@ export interface BarSync {
   cc: boolean;
   recording: boolean;
   fullscreen: boolean;
+  videoSpeed?: string;
+  deviceSpeed?: string;
 }
 
 interface FlashState {
@@ -97,7 +100,7 @@ export class UIStore {
     visible: 'none',
     faded: false,
     pinned: false,
-    pillLabel: '▶ 1x',
+    pillLabel: '1x',
     bar: DEFAULT_BAR,
     flash: { icon: null, text: '', video: null, ms: 900, nonce: 0 },
     toast: null,

@@ -28,3 +28,13 @@ export function formatTime(totalSeconds: number): string {
     ? `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
     : `${m}:${String(sec).padStart(2, '0')}`;
 }
+
+export function formatStreamTime(currentTime: number, duration: number): string {
+  if (!isFinite(currentTime) || currentTime < 0) return '';
+  const cur = formatTime(currentTime);
+  if (isFinite(duration) && duration > 0) {
+    return `${cur} / ${formatTime(duration)}`;
+  }
+  return cur;
+}
+

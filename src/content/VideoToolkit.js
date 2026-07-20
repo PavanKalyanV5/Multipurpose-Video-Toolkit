@@ -6,6 +6,7 @@ import { VideoRecorder } from './VideoRecorder.js';
 import { ToolbarUI } from './ToolbarUI.js';
 import { VideoScanner } from './VideoScanner.js';
 import { StatsTracker } from './StatsTracker.js';
+import { NetworkTracker } from './NetworkTracker.js';
 
 export class VideoToolkit {
   // Sub-systems (public so Scanner/UI callbacks can access them)
@@ -15,6 +16,7 @@ export class VideoToolkit {
   recorder = new VideoRecorder();
   ui       = new ToolbarUI();
   stats    = new StatsTracker();
+  netTracker = new NetworkTracker();
   scanner  = null; // created in init() after ui is mounted
 
   #site    = location.hostname;
@@ -65,6 +67,11 @@ export class VideoToolkit {
     this.#bindMouseMove();
     this.#bindKeyboard();
     this.#bindMessages();
+    this.netTracker.start((stats) => {
+      if (this.ui.currentVideo) {
+        this.ui.syncBar(this.ui.currentVideo, this.booster, this.#cinemaVideos.has(this.ui.currentVideo), stats);
+      }
+    });
   }
 
   // ── Settings load ─────────────────────────────────────────────────────────────
@@ -115,7 +122,7 @@ export class VideoToolkit {
       isEnabled:    () => this.enabled,
       isRecording:  () => this.recorder.isRecording(this.ui.currentVideo),
       onPillShow:   (v) => { this.ui.updatePill(this.booster, this.recorder); this.reportState(v); },
-      onExpand:     (v) => this.ui.syncBar(v, this.booster, this.#cinemaVideos.has(v)),
+      onExpand:     (v) => this.ui.syncBar(v, this.booster, this.#cinemaVideos.has(v), this.netTracker.measure(v)),
       onCollapse:   ()  => this.ui.updatePill(this.booster, this.recorder),
       onTimeUpdate: ()  => this.ui.updatePill(this.booster, this.recorder),
       onButtonClick: (action, video, arg) => this.#handleAction(action, video, arg),
@@ -141,6 +148,11 @@ export class VideoToolkit {
       case 'copyTs':  this.#copyTimestamp(video); break;
       case 'rec':     this.#toggleRecord(video); break;
       case 'dl':      this.#triggerDownload(video); break;
+      case 'netSpeed': {
+        const stats = this.netTracker.measure(video);
+        this.ui.toast(`Network: ${stats.videoSpeed} · ${stats.deviceSpeed}`, 2600);
+        break;
+      }
     }
   }
 
@@ -643,6 +655,7 @@ export class VideoToolkit {
       boostGain: video ? this.booster.getGain(video) : 1,
       cc:       video ? Array.from(video.textTracks || []).some((t) => t.mode === 'showing') : false,
       eq:       video ? this.booster.getEqGains(video) : EQ_BANDS.map(() => 0),
+      netStats: video ? this.netTracker.measure(video) : null,
     };
   }
 

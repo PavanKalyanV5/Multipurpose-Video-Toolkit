@@ -18,6 +18,7 @@
    - [3.7 Background Media Sniffer & Rules Dispatcher (`background.js`)](#37-background-media-sniffer--rules-dispatcher-backgroundjs)
    - [3.8 Custom CSS/JS Site Injector (`injector.js` & `rules.html`)](#38-custom-cssjs-site-injector-injectorjs--ruleshtml)
    - [3.9 Usage Analytics Tracker (`StatsTracker.js` & `dashboard.html`)](#39-usage-analytics-tracker-statstrackerjs--dashboardhtml)
+   - [3.10 Real-Time Network Tracker & DNR Header Injection (`NetworkTracker.js` & `dnr_rules.json`)](#310-real-time-network-tracker--dnr-header-injection-networktrackerjs--dnr_rulesjson)
 4. [Detailed Data Flow & Sequence Diagrams](#4-detailed-data-flow--sequence-diagrams)
    - [4.1 Initialization & Per-Site Opt-in Sequence](#41-initialization--per-site-opt-in-sequence)
    - [4.2 Web Audio Node Graph & Equalizer Routing](#42-web-audio-node-graph--equalizer-routing)
@@ -166,6 +167,12 @@ graph TB
 - **Key Mechanics**:
   - Monitors `play`, `pause`, and `timeupdate` events to compute active watch seconds.
   - Aggregates records locally into `uvt_stats_v1` without sending external network requests (100% privacy).
+
+### 3.10 Real-Time Network Tracker & DNR Header Injection (`NetworkTracker.js` & `dnr_rules.json`)
+- **Active Chunk Throughput Math**: Measures actual download rate during active fetch windows ($\sum \text{Bytes} / \sum (\text{responseEnd} - \text{startTime})$) to handle YouTube's burst-and-idle chunk streaming patterns accurately.
+- **TimeRanges-Aware Buffer Lookup**: Dynamically identifies the exact `TimeRanges` index containing `video.currentTime` to track buffer growth without seek distortions.
+- **Idle Persistence**: Holds and gently decays the last active throughput during buffer idle holds, preventing the speed readout from diving to 0 B/s.
+- **CORS Unlocking via `declarativeNetRequest`**: Manifest V3 `dnr_rules.json` injects `Timing-Allow-Origin: *` into media responses natively in Chromium's C++ network layer, unlocking precise `transferSize` in content script `PerformanceResourceTiming` entries.
 
 ---
 

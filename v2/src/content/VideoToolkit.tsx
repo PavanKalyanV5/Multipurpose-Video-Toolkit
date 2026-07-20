@@ -1,5 +1,5 @@
 import { createRoot, type Root } from 'react-dom/client';
-import { SPEEDS, BOOSTS, EQ_BANDS, EQ_PRESETS, formatTime } from '../shared/constants';
+import { SPEEDS, BOOSTS, EQ_BANDS, EQ_PRESETS, formatTime, formatStreamTime } from '../shared/constants';
 import { SessionManager } from '../shared/SessionManager';
 import { AudioBooster } from '../shared/AudioBooster';
 import { ABLoopManager } from '../shared/ABLoopManager';
@@ -8,6 +8,7 @@ import { StatsTracker } from '../shared/StatsTracker';
 import type { ActiveVideoState, MediaItem, RuntimeMessage, StorageShape, SubtitlePayload, SubtitleStyle } from '../shared/types';
 import { UIStore } from './UIStore';
 import { VideoScanner } from './VideoScanner';
+import { NetworkTracker } from './NetworkTracker';
 import { ToolbarRoot } from './components/ToolbarRoot';
 import toolbarCss from './toolbar.css?inline';
 
@@ -21,6 +22,7 @@ export class VideoToolkit {
   recorder = new VideoRecorder();
   stats = new StatsTracker();
   store = new UIStore();
+  netTracker = new NetworkTracker();
   scanner: VideoScanner | null = null; // created in #activate()
 
   #site = location.hostname;
@@ -79,6 +81,12 @@ export class VideoToolkit {
     this.#bindMouseMove();
     this.#bindKeyboard();
     this.#bindMessages();
+    this.netTracker.start((stats) => {
+      const v = this.store.currentVideo;
+      if (v) {
+        this.store.setBar({ videoSpeed: stats.videoSpeed, deviceSpeed: stats.deviceSpeed });
+      }
+    });
   }
 
   // ── Settings load ─────────────────────────────────────────────────────────────
@@ -132,6 +140,7 @@ export class VideoToolkit {
   }
 
   #refreshBar(video: HTMLVideoElement) {
+    const netStats = this.netTracker.measure(video);
     this.store.setBar({
       rate: video.playbackRate,
       loop: video.loop,
@@ -142,16 +151,19 @@ export class VideoToolkit {
       cinema: this.#cinemaVideos.has(video),
       cc: Array.from(video.textTracks || []).some((t) => t.mode === 'showing'),
       recording: this.recorder.isRecording(video),
+      videoSpeed: netStats.videoSpeed,
+      deviceSpeed: netStats.deviceSpeed,
     });
   }
 
   refreshPill() {
     const video = this.store.currentVideo;
     if (!video) return;
-    const ts = isFinite(video.currentTime) ? ' · ' + formatTime(video.currentTime) : '';
+    const streamStr = formatStreamTime(video.currentTime, video.duration);
+    const ts = streamStr ? ` · ${streamStr}` : '';
     const boostGain = this.booster.getGain(video);
     const boostLabel = boostGain > 1 ? ` · ${Math.round(boostGain * 100)}%` : '';
-    const recLabel = this.recorder.isRecording(video) ? `⏺ ${formatTime(this.recorder.elapsedSeconds(video))} ` : '▶ ';
+    const recLabel = this.recorder.isRecording(video) ? `Rec (${formatTime(this.recorder.elapsedSeconds(video))}) · ` : '';
     this.store.setPill(`${recLabel}${video.playbackRate}x${boostLabel}${ts}`);
   }
 
@@ -209,6 +221,11 @@ export class VideoToolkit {
       case 'dl':
         this.#triggerDownload(video);
         break;
+      case 'netSpeed': {
+        const stats = this.netTracker.measure(video);
+        this.store.toast(`Network: ${stats.videoSpeed} · ${stats.deviceSpeed}`, 2600);
+        break;
+      }
     }
   }
 

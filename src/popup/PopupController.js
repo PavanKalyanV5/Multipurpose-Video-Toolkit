@@ -44,6 +44,8 @@ export class PopupController {
       eqPresetBtns:   Array.from(document.querySelectorAll('.eq-preset-btn')),
       dashboardBtn:   document.getElementById('dashboardBtn'),
       rulesBtn:       document.getElementById('rulesBtn'),
+      popupVidSpeed:  document.getElementById('popupVidSpeed'),
+      popupDevSpeed:  document.getElementById('popupDevSpeed'),
     };
   }
 
@@ -136,6 +138,11 @@ export class PopupController {
 
       loopToggle.checked = state.loop;
       ccToggle.checked   = state.cc;
+
+      if (state.netStats) {
+        if (this.#els.popupVidSpeed) this.#els.popupVidSpeed.textContent = state.netStats.videoSpeed;
+        if (this.#els.popupDevSpeed) this.#els.popupDevSpeed.textContent = state.netStats.deviceSpeed;
+      }
 
       this._syncEq(state.eq || this.#els.eqSliders.map(() => 0));
     } finally {

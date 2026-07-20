@@ -22,3 +22,13 @@ export function formatTime(totalSeconds) {
     ? `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
     : `${m}:${String(sec).padStart(2, '0')}`;
 }
+
+export function formatStreamTime(currentTime, duration) {
+  if (!isFinite(currentTime) || currentTime < 0) return '';
+  const cur = formatTime(currentTime);
+  if (isFinite(duration) && duration > 0) {
+    return `${cur} / ${formatTime(duration)}`;
+  }
+  return cur;
+}
+

@@ -30,7 +30,8 @@ The project is structured into two major architectural versions:
 
 | Feature Category | Capability | Description |
 | :--- | :--- | :--- |
-| **Hover Controls Overlay** | Playback & Transform | Instant speed toggles (0.25x – 4.0x), frame-by-frame seeking (±0.04s), video rotation (90°/180°/270°), picture-in-picture, cinema/focus mode, fullscreen. |
+| **Hover Controls Overlay** | Playback & Transform | Instant speed toggles (0.25x – 4.0x), frame-by-frame seeking (±0.04s), video rotation (90°/180°/270°), picture-in-picture, cinema/focus mode, fullscreen, and stream position/end time display (`currentTime / duration`). |
+| **Network Speed Monitor** | Video & Device Bandwidth | Real-time tracking of Video Consumption Speed vs. Device Receiving Bandwidth with active chunk throughput math, TimeRanges buffer lookup, idle persistence, and `declarativeNetRequest` CORS `Timing-Allow-Origin` header injection. |
 | **Audio Engineering** | 8-Band Equalizer & Gain | Up to 600% volume boost using Web Audio API `AudioContext` and `GainNode`, plus an 8-band equalizer (60Hz – 14kHz) with presets (Bass Boost, Vocal, Treble, Flat, Rock, Jazz). |
 | **Precision Looping** | A/B Loop | Set custom Start (A) and End (B) timestamps with visual indicators on the video timeline for repeated study/practice. |
 | **Media Recorder** | Capture & Export | High-quality WebM video recording of player elements via `captureStream()` or fallback HTML5 Canvas capture, plus single-frame PNG screenshots. |

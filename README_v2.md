@@ -16,6 +16,7 @@
    - [4.3 React Content Script & Component Engine (`ToolbarRoot.tsx`)](#43-react-content-script--component-engine-toolbarroottsx)
    - [4.4 CodeMirror 6 Site Rules Editor (`v2/src/pages/rules/`)](#44-codemirror-6-site-rules-editor-v2srcpagesrules)
    - [4.5 MUI Analytics Dashboard (`v2/src/pages/dashboard/`)](#45-mui-analytics-dashboard-v2srcpagesdashboard)
+   - [4.6 Network Speed Tracker & DNR Ruleset (`v2/src/content/NetworkTracker.ts` & `v2/public/dnr_rules.json`)](#46-network-speed-tracker--dnr-ruleset-v2srccontentnetworktrackerts--v2publicdnr_rulesjson)
 5. [Detailed Data Flow & Sequence Diagrams](#5-detailed-data-flow--sequence-diagrams)
    - [5.1 Vite CRXJS Build & HMR Injection Flow](#51-vite-crxjs-build--hmr-injection-flow)
    - [5.2 React Shadow DOM Isolation & Emotion Cache Hydration](#52-react-shadow-dom-isolation--emotion-cache-hydration)
@@ -161,6 +162,13 @@ v2/
 - **Key Mechanics**:
   - Built with `@mui/material` v6 and `@mui/x-charts`.
   - Displays bar charts for daily watch time, pie charts for domain breakdown, and summary cards for average playback speeds and total sessions.
+
+### 4.6 Network Speed Tracker & DNR Ruleset (`v2/src/content/NetworkTracker.ts` & `v2/public/dnr_rules.json`)
+- **File Paths**: [`v2/src/content/NetworkTracker.ts`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/v2/src/content/NetworkTracker.ts), [`v2/public/dnr_rules.json`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/v2/public/dnr_rules.json)
+- **Role**: Tracks Video Consumption Speed vs. Device Receiving Speed in TypeScript.
+- **Key Mechanics**:
+  - Incorporates per-chunk active throughput math ($\frac{\text{Bytes}}{\text{Active Fetch Time}}$), TimeRanges-aware buffer progression lookup, and idle-pause persistence.
+  - Manifest V3 `dnr_rules.json` injects `Timing-Allow-Origin: *` into media responses natively in Chromium's network engine.
 
 ---
 
