@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Universal Video Toolkit — Dashboard</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --page-1: #0e111a;
+    --page-2: #151824;
+    --surface: rgba(255,255,255,0.03);
+    --surface-border: rgba(255,255,255,0.06);
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent: #38bdf8;
+    --accent-dim: rgba(56,189,248,0.15);
+    --gridline: rgba(255,255,255,0.06);
+    --baseline: rgba(255,255,255,0.14);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--page-1) 0%, var(--page-2) 100%);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    padding: 32px 40px 60px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo-icon { color: var(--accent); filter: drop-shadow(0 0 8px rgba(56,189,248,.4)); flex-shrink: 0; }
+  h1 {
+    font-size: 20px; font-weight: 700; margin: 0;
+    background: linear-gradient(90deg, #38bdf8 0%, #a855f7 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  .reset-btn {
+    background: rgba(255,255,255,0.04); border: 1px solid var(--surface-border);
+    color: var(--text-secondary); padding: 8px 14px; border-radius: 8px;
+    font-size: 12px; font-weight: 600; cursor: pointer; transition: all .2s ease;
+  }
+  .reset-btn:hover { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,.35); color: #fca5a5; }
+
+  .kpi-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin-bottom: 20px;
+  }
+  .stat-tile {
+    background: var(--surface); border: 1px solid var(--surface-border);
+    border-radius: 12px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  }
+  .stat-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+  .stat-value { font-size: 26px; font-weight: 700; margin-top: 6px; color: var(--text-primary); }
+  .stat-sub { font-size: 11.5px; color: var(--text-secondary); margin-top: 3px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--surface-border);
+    border-radius: 14px; padding: 20px; margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  }
+  .card-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    color: #78c8ff; margin-bottom: 16px;
+  }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .bar-row { display: flex; align-items: center; gap: 10px; padding: 5px 0; }
+  .bar-label {
+    width: 108px; flex-shrink: 0; font-size: 12px; color: var(--text-secondary);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .bar-track { flex: 1; position: relative; height: 20px; }
+  .bar-fill {
+    position: absolute; left: 0; top: 3px; height: 14px;
+    background: var(--accent); border-radius: 0 4px 4px 0;
+    transition: width .5s cubic-bezier(.34,1.2,.64,1);
+  }
+  .bar-value { font-size: 11.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .trend-chart { display: flex; align-items: flex-end; gap: 8px; height: 160px; padding-top: 20px; position: relative; }
+  .trend-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+  .trend-bar {
+    width: 100%; max-width: 34px; background: var(--accent); border-radius: 4px 4px 0 0;
+    transition: height .5s cubic-bezier(.34,1.2,.64,1); position: relative;
+    min-height: 2px;
+  }
+  .trend-value { font-size: 10.5px; color: var(--text-secondary); margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+  .trend-day { font-size: 10.5px; color: var(--text-muted); margin-top: 8px; }
+  .trend-baseline { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--baseline); }
+
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 60px 20px; text-align: center; color: var(--text-muted); font-size: 13px;
+    border: 1px dashed var(--surface-border); border-radius: 14px;
+  }
+  .empty-state svg { color: #475569; margin-bottom: 12px; }
+  .empty-state strong { color: var(--text-secondary); display: block; margin-bottom: 4px; font-size: 14px; }
+
+  #content { display: none; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div class="header-left">
+        <svg class="logo-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 7a2 2 0 0 0-2.45-1.45L16 7V5a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2l4.55 1.45A2 2 0 0 0 23 17V7z"/>
+        </svg>
+        <div>
+          <h1>Dashboard</h1>
+          <div class="subtitle">Your Universal Video Toolkit usage, tracked locally on this device</div>
+        </div>
+      </div>
+      <button class="reset-btn" id="resetBtn">Reset stats</button>
+    </div>
+
+    <div class="card" style="display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 20px;">
+      <div>
+        <div class="card-title" style="margin-bottom:2px;">Backup &amp; restore</div>
+        <div style="font-size:11.5px; color:#64748b;">Settings, custom rules, EQ, and enabled sites — everything except live stats/session state.</div>
+      </div>
+      <div style="display:flex; gap:8px; flex-shrink:0;">
+        <button class="reset-btn" id="exportBtn" style="color:#38bdf8; border-color:rgba(56,189,248,.3);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+        <button class="reset-btn" id="importBtn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Import
+        </button>
+        <input type="file" id="importFile" accept="application/json" style="display:none;">
+      </div>
+    </div>
+
+    <div id="empty" class="empty-state">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>
+      </svg>
+      <strong>No data yet</strong>
+      Use the toolbar on any enabled site — speed, volume, loop, screenshots — and stats will start showing up here.
+    </div>
+
+    <div id="content">
+      <div class="kpi-row">
+        <div class="stat-tile">
+          <div class="stat-label">Total watch time</div>
+          <div class="stat-value" id="kpiWatchTime">—</div>
+          <div class="stat-sub" id="kpiWatchSub">&nbsp;</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-label">Sites tracked</div>
+          <div class="stat-value" id="kpiSites">—</div>
+          <div class="stat-sub">&nbsp;</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-label">Actions taken</div>
+          <div class="stat-value" id="kpiActions">—</div>
+          <div class="stat-sub">speed, volume, loop, and more</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-label">Most active site</div>
+          <div class="stat-value" id="kpiTopSite" style="font-size:18px;">—</div>
+          <div class="stat-sub" id="kpiTopSiteSub">&nbsp;</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Watch time — last 7 days</div>
+        <div class="trend-chart" id="trendChart"></div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Top sites by watch time</div>
+          <div id="sitesChart"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Feature usage</div>
+          <div id="actionsChart"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="src/dashboard/DashboardController.js"></script>
+</body>
+</html>

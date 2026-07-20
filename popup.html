@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body {
+    width: 320px;
+    margin: 0;
+    padding: 16px;
+    background: linear-gradient(135deg, #0e111a 0%, #151824 100%);
+    color: #e2e8f0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    user-select: none;
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .header-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .icon-btn {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .icon-btn:hover {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: rgba(56, 189, 248, 0.4);
+    color: #38bdf8;
+  }
+
+  .logo-icon {
+    color: #38bdf8;
+    filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.4));
+  }
+  
+  h1 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(90deg, #38bdf8 0%, #a855f7 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .subtitle {
+    font-size: 10px;
+    color: #64748b;
+    margin-top: 1px;
+    font-weight: 500;
+  }
+  
+  .card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .card-title {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #78c8ff;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .control-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+  
+  .control-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  
+  .control-row:first-of-type {
+    padding-top: 0;
+  }
+  
+  .control-row span {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #cbd5e1;
+  }
+
+  .control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Row label icons */
+  .row-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .row-label svg {
+    color: #64748b;
+    flex-shrink: 0;
+  }
+
+  /* Speed preset buttons */
+  .preset-row {
+    display: flex;
+    gap: 4px;
+    padding: 4px 0 6px;
+  }
+  .speed-preset {
+    flex: 1;
+    padding: 5px 0;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .speed-preset:hover {
+    background: rgba(255, 255, 255, 0.09);
+    color: #cbd5e1;
+  }
+  .speed-preset.active {
+    background: rgba(56, 189, 248, 0.18);
+    border-color: rgba(56, 189, 248, 0.5);
+    color: #38bdf8;
+    font-weight: 600;
+  }
+
+  /* Boost value turns amber past 2x — a heads-up that audio may start clipping */
+  #boostValue.hot { color: #fb923c; }
+
+  /* Equalizer preset pills — reuses .preset-row for layout, own hover/active look */
+  .eq-preset-btn {
+    flex: 1;
+    padding: 5px 2px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    font-size: 10.5px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .eq-preset-btn:hover { background: rgba(255, 255, 255, 0.09); color: #cbd5e1; }
+  .eq-preset-btn.active {
+    background: rgba(56, 189, 248, 0.18);
+    border-color: rgba(56, 189, 248, 0.5);
+    color: #38bdf8;
+    font-weight: 600;
+  }
+
+  /* Equalizer band sliders */
+  .eq-bands {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 2px 2px;
+  }
+  .eq-band {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    flex: 1;
+  }
+  .eq-value {
+    font-size: 9px;
+    color: #64748b;
+    font-variant-numeric: tabular-nums;
+    min-height: 11px;
+    transition: color 0.15s ease;
+  }
+  .eq-value.boosted { color: #38bdf8; }
+  .eq-value.cut { color: #fb923c; }
+
+  /* `-webkit-appearance: slider-vertical` is deprecated and unreliable in
+     current Chrome (it silently falls back to a horizontal slider). The
+     robust cross-version approach: lay the <input> out horizontally at its
+     natural size, then rotate it -90deg (so the left/min end lands at the
+     bottom and the right/max end at the top — natural fader orientation),
+     inside a fixed-size wrapper sized to match the *post-rotation* footprint
+     so it centers correctly instead of overflowing its flex column. */
+  .eq-slider-track {
+    width: 22px;
+    height: 84px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .eq-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 84px;
+    height: 18px;
+    margin: 0;
+    background: transparent;
+    outline: none;
+    cursor: pointer;
+    transform: rotate(-90deg);
+  }
+  .eq-slider::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .eq-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    margin-top: -5px;
+    border-radius: 50%;
+    background: #38bdf8;
+    cursor: pointer;
+    box-shadow: 0 0 4px rgba(56, 189, 248, 0.5);
+  }
+  .eq-freq { font-size: 8.5px; color: #64748b; }
+
+  /* Custom Toggle Switches */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+  }
+  
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(255, 255, 255, 0.08);
+    transition: .25s ease;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 2px;
+    bottom: 2px;
+    background-color: #94a3b8;
+    transition: .25s ease;
+    border-radius: 50%;
+  }
+  
+  input:checked + .slider {
+    background-color: rgba(56, 189, 248, 0.15);
+    border-color: rgba(56, 189, 248, 0.4);
+  }
+  
+  input:checked + .slider:before {
+    transform: translateX(16px);
+    background-color: #38bdf8;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+  }
+  
+  input:disabled + .slider {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  
+  /* Slider Inputs */
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 90px;
+    background: rgba(255, 255, 255, 0.08);
+    height: 4px;
+    border-radius: 2px;
+    outline: none;
+  }
+  
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #38bdf8;
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(56, 189, 248, 0.5);
+    transition: transform 0.1s ease;
+  }
+  
+  input[type=range]::-webkit-slider-thumb:hover {
+    transform: scale(1.25);
+  }
+  
+  #speedValue, #boostValue {
+    font-size: 12px;
+    font-weight: 600;
+    color: #38bdf8;
+    min-width: 40px;
+    text-align: right;
+  }
+  
+  /* Buttons */
+  .action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    color: #38bdf8;
+    padding: 9px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 10px;
+  }
+  
+  .action-btn:hover {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: #38bdf8;
+    transform: translateY(-1px);
+  }
+  
+  /* Tags */
+  #siteName {
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.08);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11.5px;
+    border: 1px solid rgba(56, 189, 248, 0.15);
+    display: inline-block;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  
+  /* Fallbacks and Hints */
+  .hint {
+    color: #64748b;
+    font-size: 11px;
+    line-height: 1.5;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 14px;
+    text-align: center;
+    color: #64748b;
+    font-size: 12px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+  }
+  
+  .empty-state svg {
+    color: #475569;
+    margin-bottom: 8px;
+  }
+
+  /* Subtitle Injector elements */
+  .text-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 11.5px;
+    color: #cbd5e1;
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+  }
+  .text-input:focus {
+    border-color: rgba(56, 189, 248, 0.45);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.15);
+  }
+  
+  .file-input-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    width: 100%;
+  }
+  
+  .file-input-wrapper input[type=file] {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  
+  .file-input-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+  }
+  
+  .file-input-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #cbd5e1;
+  }
+  
+  .sub-divider {
+    text-align: center;
+    margin: 8px 0;
+    font-size: 11px;
+    color: #64748b;
+    position: relative;
+  }
+  .sub-divider::before, .sub-divider::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 38%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .sub-divider::before { left: 0; }
+  .sub-divider::after { right: 0; }
+  
+  
+  .file-name-label {
+    display: none;
+    font-size: 11px;
+    color: #38bdf8;
+    margin-top: 4px;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Beautiful Select Dropdowns */
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #cbd5e1;
+    border-radius: 6px;
+    padding: 4px 24px 4px 8px;
+    font-size: 11.5px;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2338bdf8' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 10px;
+    box-sizing: border-box;
+  }
+  select:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(56, 189, 248, 0.4);
+    color: #f1f5f9;
+  }
+  select:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 6px rgba(56, 189, 248, 0.25);
+  }
+  select option {
+    background: #151824;
+    color: #cbd5e1;
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <svg class="logo-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M23 7a2 2 0 0 0-2.45-1.45L16 7V5a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2l4.55 1.45A2 2 0 0 0 23 17V7z"/>
+    </svg>
+    <div>
+      <h1>Universal Video Toolkit</h1>
+      <div class="subtitle">Control panel</div>
+    </div>
+    <div class="header-actions">
+      <button id="rulesBtn" class="icon-btn" title="Custom CSS/JS rules per site">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      </button>
+      <button id="dashboardBtn" class="icon-btn" title="Open usage dashboard">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Configuration Card -->
+  <div class="card">
+    <div class="card-title">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Extension Settings
+    </div>
+    <div class="control-row">
+      <span class="row-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+        Enabled everywhere
+      </span>
+      <label class="switch">
+        <input type="checkbox" id="global">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="control-row">
+      <span class="row-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Enabled on <span id="siteName">this site</span>
+      </span>
+      <label class="switch">
+        <input type="checkbox" id="site">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <!-- Feature #9: seek step -->
+    <div class="control-row">
+      <span class="row-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+        Seek step
+      </span>
+      <select id="seekStep" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#cbd5e1;border-radius:6px;padding:3px 6px;font-size:11.5px;">
+        <option value="5">5 s</option>
+        <option value="10">10 s</option>
+        <option value="30">30 s</option>
+      </select>
+    </div>
+    <!-- Feature #11: autoplay blocker -->
+    <div class="control-row">
+      <span class="row-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        Block autoplay
+      </span>
+      <label class="switch">
+        <input type="checkbox" id="autoplayBlock">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <!-- Pause videos scrolled out of view (feeds) -->
+    <div class="control-row">
+      <span class="row-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Pause off-screen videos
+      </span>
+      <label class="switch">
+        <input type="checkbox" id="pauseOffscreen">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Active Video Controls (shown only when video is active) -->
+  <div id="activeVideoControls" class="card" style="display: none;">
+    <div class="card-title">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Active Video Controls
+    </div>
+    <div class="control-row">
+      <span class="row-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Speed
+      </span>
+      <div class="control-group">
+        <input type="range" id="speedSlider" min="0.25" max="3" step="0.25" value="1">
+        <span id="speedValue">1x</span>
+      </div>
+    </div>
+    <!-- Feature #12: speed presets -->
+    <div class="preset-row">
+      <button class="speed-preset" data-speed="0.5">0.5×</button>
+      <button class="speed-preset" data-speed="1">1×</button>
+      <button class="speed-preset" data-speed="1.5">1.5×</button>
+      <button class="speed-preset" data-speed="2">2×</button>
+    </div>
+    <div class="control-row">
+      <span class="row-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>
+        Volume Boost
+      </span>
+      <div class="control-group">
+        <input type="range" id="boostSlider" min="1" max="3" step="0.05" value="1">
+        <span id="boostValue">100%</span>
+      </div>
+    </div>
+    <div class="control-row">
+      <span class="row-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>
+        Loop Video
+      </span>
+      <label class="switch">
+        <input type="checkbox" id="loopToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="control-row">
+      <span class="row-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M7 10.5h3M7 13.5h2M14 10.5h3M14 13.5h2"/></svg>
+        Captions (CC)
+      </span>
+      <label class="switch">
+        <input type="checkbox" id="ccToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <button id="pipBtn" class="action-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+        <rect x="14" y="11" width="7" height="5" rx="1"/>
+      </svg>
+      Toggle Picture-in-Picture
+    </button>
+  </div>
+
+  <!-- Equalizer -->
+  <div id="eqCard" class="card" style="display: none;">
+    <div class="card-title">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="10" y1="21" x2="10" y2="4"/><line x1="16" y1="21" x2="16" y2="10"/><line x1="20" y1="21" x2="20" y2="16"/></svg>
+      Equalizer
+    </div>
+    <div class="preset-row" id="eqPresets">
+      <button class="eq-preset-btn" data-preset="flat">Flat</button>
+      <button class="eq-preset-btn" data-preset="bass">Bass</button>
+      <button class="eq-preset-btn" data-preset="vocal">Vocal</button>
+      <button class="eq-preset-btn" data-preset="treble">Treble</button>
+      <button class="eq-preset-btn" data-preset="loudness">Loud</button>
+    </div>
+    <div class="eq-bands" id="eqBands">
+      <div class="eq-band" data-band="0">
+        <div class="eq-value">0</div>
+        <div class="eq-slider-track"><input type="range" class="eq-slider" min="-12" max="12" step="1" value="0"></div>
+        <div class="eq-freq">60</div>
+      </div>
+      <div class="eq-band" data-band="1">
+        <div class="eq-value">0</div>
+        <div class="eq-slider-track"><input type="range" class="eq-slider" min="-12" max="12" step="1" value="0"></div>
+        <div class="eq-freq">150</div>
+      </div>
+      <div class="eq-band" data-band="2">
+        <div class="eq-value">0</div>
+        <div class="eq-slider-track"><input type="range" class="eq-slider" min="-12" max="12" step="1" value="0"></div>
+        <div class="eq-freq">400</div>
+      </div>
+      <div class="eq-band" data-band="3">
+        <div class="eq-value">0</div>
+        <div class="eq-slider-track"><input type="range" class="eq-slider" min="-12" max="12" step="1" value="0"></div>
+        <div class="eq-freq">1k</div>
+      </div>
+      <div class="eq-band" data-band="4">
+        <div class="eq-value">0</div>
+        <div class="eq-slider-track"><input type="range" class="eq-slider" min="-12" max="12" step="1" value="0"></div>
+        <div class="eq-freq">2.4k</div>
+      </div>
+      <div class="eq-band" data-band="5">
+        <div class="eq-value">0</div>
+        <div class="eq-slider-track"><input type="range" class="eq-slider" min="-12" max="12" step="1" value="0"></div>
+        <div class="eq-freq">6k</div>
+      </div>
+      <div class="eq-band" data-band="6">
+        <div class="eq-value">0</div>
+        <div class="eq-slider-track"><input type="range" class="eq-slider" min="-12" max="12" step="1" value="0"></div>
+        <div class="eq-freq">12k</div>
+      </div>
+      <div class="eq-band" data-band="7">
+        <div class="eq-value">0</div>
+        <div class="eq-slider-track"><input type="range" class="eq-slider" min="-12" max="12" step="1" value="0"></div>
+        <div class="eq-freq">16k</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subtitle Injector Card (shown only when video is active) -->
+  <div id="subtitleCard" class="card" style="display: none;">
+    <div class="card-title">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        <path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/>
+      </svg>
+      Subtitle Injector
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div class="file-input-wrapper">
+        <div class="file-input-btn" id="fileBtnLabel">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Choose Subtitle File (.srt, .vtt)
+        </div>
+        <input type="file" id="subFile" accept=".srt,.vtt">
+      </div>
+      <div class="file-name-label" id="fileName">No file selected</div>
+      
+      <div class="sub-divider">OR</div>
+      
+      <input type="text" id="subUrl" class="text-input" placeholder="Paste Subtitle URL (.srt, .vtt)">
+      <!-- Feature #13: language selector -->
+      <div class="control-row" style="padding:4px 0 0;border:none;">
+        <span class="row-label" style="font-size:11px;color:#64748b;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          Track language
+        </span>
+        <select id="subLang" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#cbd5e1;border-radius:6px;padding:3px 6px;font-size:11.5px;">
+          <option value="en">English</option>
+          <option value="ar">Arabic (RTL)</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+          <option value="ja">Japanese</option>
+          <option value="ko">Korean</option>
+          <option value="zh">Chinese</option>
+          <option value="pt">Portuguese</option>
+          <option value="hi">Hindi</option>
+        </select>
+      </div>
+
+      <div class="control-row" style="padding:6px 0 0;border:none;">
+        <span class="row-label" style="font-size:11px;color:#64748b;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+          Subtitle size
+        </span>
+        <div class="control-group">
+          <input type="range" id="subSizeSlider" min="12" max="36" step="1" value="20">
+          <span id="subSizeValue">20px</span>
+        </div>
+      </div>
+      <div class="control-row" style="padding:4px 0 0;border:none;">
+        <span class="row-label" style="font-size:11px;color:#64748b;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/></svg>
+          Background
+        </span>
+        <div class="control-group">
+          <input type="range" id="subBgSlider" min="0" max="100" step="5" value="70">
+          <span id="subBgValue">70%</span>
+        </div>
+      </div>
+
+      <button id="injectBtn" class="action-btn" style="margin-top: 4px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        Inject Subtitles
+      </button>
+    </div>
+  </div>
+
+  <!-- Fallback (shown when no video is active) -->
+  <div id="noVideo" class="empty-state">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10.66 6H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-1.34"/>
+      <path d="M16 16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2"/>
+      <path d="M23 7l-6 5 6 5z"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    </svg>
+    No active video detected on this page
+  </div>
+
+  <!-- Feature #7: keyboard shortcut cheat sheet -->
+  <div class="hint">
+    <strong style="color:#475569;display:block;margin-bottom:5px;">Overlay controls</strong>
+    Hover any video — drag pill/bar to reposition.
+    <br><strong style="color:#475569;display:block;margin:5px 0 2px;">Keyboard shortcuts (Alt+…)</strong>
+    <span style="color:#38bdf8;">&#8592;/&#8594;</span> seek (while hovering a video) &nbsp;
+    <span style="color:#38bdf8;">&#8593;/&#8595;</span> speed &nbsp;
+    <span style="color:#38bdf8;">M</span> mute &nbsp;
+    <span style="color:#38bdf8;">P</span> PiP &nbsp;
+    <span style="color:#38bdf8;">F</span> fullscreen &nbsp;
+    <span style="color:#38bdf8;">R</span>/<span style="color:#38bdf8;">Shift+R</span> rotate<br>
+    <span style="color:#38bdf8;">,</span>/<span style="color:#38bdf8;">.</span> frame step<br>
+    <span style="color:#38bdf8;">[</span> A-loop start &nbsp;
+    <span style="color:#38bdf8;">]</span> A-B end &nbsp;
+    <span style="color:#38bdf8;">&bsol;</span> clear loop
+  </div>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

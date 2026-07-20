@@ -1,0 +1,215 @@
+:host { all: initial; }
+
+#pill {
+  position: fixed; display: flex; align-items: center;
+  background: linear-gradient(135deg, rgba(14,20,32,.92) 0%, rgba(20,26,42,.88) 100%);
+  border: 1px solid rgba(56,189,248,.45);
+  border-radius: 999px; padding: 6px 14px; cursor: grab;
+  font: 12px/1 'Inter', system-ui, sans-serif; color: #38bdf8; font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0,0,0,.35), 0 0 10px rgba(56,189,248,.15);
+  user-select: none; white-space: nowrap;
+  opacity: 0; pointer-events: none; transform: scale(.9);
+  transition: opacity .25s ease, transform .25s ease, cursor .1s ease;
+}
+
+#pill.show  { opacity: 1; pointer-events: auto; transform: scale(1); }
+
+#pill:hover {
+  transform: scale(1.04); border-color: #38bdf8;
+  box-shadow: 0 4px 20px rgba(0,0,0,.4), 0 0 15px rgba(56,189,248,.25);
+}
+
+#pill.faded { opacity: 0; pointer-events: none; transform: scale(.9); }
+
+#bar {
+  position: fixed; display: flex; align-items: center; gap: 4px;
+  background: linear-gradient(135deg, rgba(10,12,18,.95) 0%, rgba(18,22,34,.95) 100%);
+  border: 1px solid rgba(56,189,248,.35);
+  border-radius: 10px; padding: 5px 8px;
+  font: 12px/1 'Inter', system-ui, sans-serif; color: #cbd5e1;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, .5), 0 8px 10px -6px rgba(0, 0, 0, .5), 0 0 12px rgba(56, 189, 248, .1);
+  user-select: none; backdrop-filter: blur(12px); cursor: grab;
+  opacity: 0; pointer-events: none; transform: scale(.95) translateY(-5px);
+  transition: opacity .25s ease, transform .25s ease, cursor .1s ease;
+}
+
+#bar.show { opacity: 1; pointer-events: auto; transform: scale(1) translateY(0); }
+
+button {
+  all: unset; cursor: pointer; padding: 5px 8px; border-radius: 6px;
+  color: #cbd5e1; font: 12px/1 'Inter', system-ui, sans-serif; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 5px;
+  transition: background .2s ease, color .2s ease, transform .2s ease, border-color .2s ease;
+}
+
+button svg { width: 14px; height: 14px; flex-shrink: 0; display: block; }
+
+button:hover {
+  background: rgba(56,189,248,.15); color: #38bdf8; transform: translateY(-.5px);
+}
+
+button:active  { transform: scale(.96); }
+
+button.active  {
+  background: rgba(56,189,248,.25); color: #38bdf8;
+  border: 1px solid rgba(56,189,248,.3); font-weight: 600;
+}
+
+/* Mute button: the slash line only shows once muted */
+.mute-slash { display: none; }
+#mute.active .mute-slash { display: inline; }
+
+/* Rec button: swap the dot for a square once recording */
+#rec .rec-square { display: none; }
+#rec.active .rec-dot { display: none; }
+#rec.active .rec-square { display: inline; }
+
+#spd { min-width: 36px; text-align: center; color: #38bdf8; font-weight: 700; font-size: 11.5px; }
+
+#msg {
+  position: fixed; display: none;
+  background: linear-gradient(135deg, rgba(10,12,18,.96) 0%, rgba(18,22,34,.96) 100%);
+  color: #f1f5f9; border-radius: 8px; padding: 8px 12px;
+  font: 12px 'Inter', system-ui, sans-serif; max-width: 300px;
+  border: 1px solid rgba(56,189,248,.35);
+  box-shadow: 0 4px 20px rgba(0,0,0,.4); backdrop-filter: blur(8px);
+}
+
+/* Center-of-video OSD flash — mirrors YouTube's native playback-speed/seek
+   readout. Short, bold, glanceable; fades in/out rather than snapping. */
+#flash {
+  position: fixed; display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: rgba(10, 12, 18, 0.78);
+  color: #fff; font: 700 20px/1 'Inter', system-ui, sans-serif;
+  padding: 14px 22px; border-radius: 14px; min-width: 34px;
+  text-align: center; white-space: nowrap;
+  border: 1px solid rgba(56,189,248,.3);
+  box-shadow: 0 8px 24px rgba(0,0,0,.4); backdrop-filter: blur(6px);
+  pointer-events: none; user-select: none;
+  opacity: 0; transform: translate(-50%, -50%) scale(.8);
+  transition: opacity .18s ease, transform .32s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+/* A soft cyan glow pulses outward on entry — reinforces the "flash" and only
+   plays once per appearance (doesn't loop, doesn't fight the hover states
+   used elsewhere in the toolbar). */
+#flash.show {
+  opacity: 1; transform: translate(-50%, -50%) scale(1);
+  animation: flashGlow .6s ease-out;
+}
+
+@keyframes flashGlow {
+  0%   { box-shadow: 0 8px 24px rgba(0,0,0,.4), 0 0 0 rgba(56,189,248,0); }
+  35%  { box-shadow: 0 8px 24px rgba(0,0,0,.4), 0 0 30px rgba(56,189,248,.4); }
+  100% { box-shadow: 0 8px 24px rgba(0,0,0,.4), 0 0 0 rgba(56,189,248,0); }
+}
+
+#flashIcon:empty { display: none; }
+#flashIcon svg {
+  width: 22px; height: 22px; display: block; flex-shrink: 0; color: #38bdf8;
+}
+#flash.show #flashIcon svg { animation: flashIconPop .35s cubic-bezier(.34, 1.56, .64, 1); }
+
+@keyframes flashIconPop {
+  0%   { transform: scale(.4) rotate(-10deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.sep { width: 1px; height: 16px; background: rgba(255,255,255,.08); margin: 0 2px; }
+
+#picker {
+  position: fixed; display: none; flex-direction: column; gap: 4px;
+  background: linear-gradient(135deg, rgba(10,12,18,.98) 0%, rgba(18,22,34,.98) 100%);
+  border: 1px solid rgba(56,189,248,.35);
+  border-radius: 10px; padding: 10px; min-width: 260px; max-width: 360px;
+  font: 12px 'Inter', system-ui, sans-serif; color: #cbd5e1;
+  box-shadow: 0 10px 30px rgba(0,0,0,.6); backdrop-filter: blur(12px);
+}
+
+#picker .ph {
+  color: #38bdf8; font-weight: 700; padding: 2px 4px 6px;
+  border-bottom: 1px solid rgba(255,255,255,.06); margin-bottom: 6px;
+}
+
+#picker .p-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Beautiful Custom Scrollbar for Download Picker */
+#picker .p-list::-webkit-scrollbar {
+  width: 6px;
+}
+#picker .p-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 3px;
+}
+#picker .p-list::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.25);
+  border-radius: 3px;
+}
+#picker .p-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.45);
+}
+
+#picker .pi {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 0 10px;
+  border-radius: 6px;
+  width: 100%;
+  height: 32px;
+  box-sizing: border-box;
+  font: 12px 'Inter', system-ui, sans-serif;
+  line-height: normal;
+}
+
+#picker .pi:hover {
+  background: rgba(56,189,248,.12); color: #38bdf8;
+  border-color: rgba(56,189,248,.2);
+}
+
+#picker .pc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #64748b;
+  margin-top: 6px;
+  border: none;
+  background: transparent;
+  font: 11px 'Inter', system-ui, sans-serif;
+  line-height: 1.4;
+  text-align: center;
+  cursor: pointer;
+  padding: 6px 12px;
+  width: 100%;
+  height: auto;
+  min-height: 32px;
+  box-sizing: border-box;
+  white-space: normal;
+}
+
+#picker .pc:hover { color: #f1f5f9; background: rgba(255, 255, 255, 0.03); border-radius: 6px; }
+
+#rec.active {
+  background: rgba(239,68,68,.2); color: #ef4444;
+  border: 1px solid rgba(239,68,68,.4);
+  animation: recPulse 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes recPulse {
+  0%   { box-shadow: 0 0 4px rgba(239,68,68,.2); }
+  100% { box-shadow: 0 0 12px rgba(239,68,68,.6); }
+}

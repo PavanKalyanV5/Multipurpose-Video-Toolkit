@@ -1,0 +1,55 @@
+{
+  "manifest_version": 3,
+  "name": "Universal Video Toolkit",
+  "version": "4.0.0",
+  "description": "Hover controls for any video, any site: speed, seek, rotate, cinema mode, PiP, fullscreen, screenshot, record, volume boost with an 8-band EQ, captions, downloads, subtitles, and a local usage dashboard. Plus per-site custom CSS/JS injection with a full code editor. Off by default — enable per site from the popup.",
+  "permissions": ["downloads", "storage", "webRequest", "scripting", "tabs"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/rules/injector.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/content/constants.js",
+        "src/content/SessionManager.js",
+        "src/content/AudioBooster.js",
+        "src/content/ABLoopManager.js",
+        "src/content/VideoRecorder.js",
+        "src/content/ToolbarUI.js",
+        "src/content/VideoScanner.js",
+        "src/content/StatsTracker.js",
+        "src/content/VideoToolkit.js",
+        "src/content/toolbar.css",
+        "src/content/toolbar.html"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Universal Video Toolkit",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

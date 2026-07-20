@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Welcome — Universal Video Toolkit</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0e111a 0%, #151824 100%);
+    color: #e2e8f0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 56px 20px;
+  }
+  .wrap { max-width: 620px; width: 100%; }
+
+  .header { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+  .logo-icon { color: #38bdf8; filter: drop-shadow(0 0 10px rgba(56,189,248,.45)); flex-shrink: 0; }
+  h1 {
+    font-size: 26px; font-weight: 700; margin: 0;
+    background: linear-gradient(90deg, #38bdf8 0%, #a855f7 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .subtitle { font-size: 13px; color: #64748b; margin-top: 4px; }
+
+  .card {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px; padding: 22px 24px; margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  }
+  .card-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    color: #78c8ff; margin-bottom: 14px;
+  }
+
+  .step-list { list-style: none; margin: 0; padding: 0; counter-reset: step; }
+  .step-list li {
+    counter-increment: step;
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-list li::before {
+    content: counter(step);
+    flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.35);
+    color: #38bdf8; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step-text { font-size: 13.5px; line-height: 1.6; color: #cbd5e1; padding-top: 2px; }
+  .step-text strong { color: #f1f5f9; }
+  .step-text code {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px; padding: 1px 6px; font-size: 12px; color: #38bdf8;
+  }
+
+  .why-box {
+    display: flex; gap: 10px; align-items: flex-start;
+    background: rgba(56,189,248,0.05); border: 1px solid rgba(56,189,248,0.15);
+    border-radius: 10px; padding: 12px 14px; font-size: 12px; color: #94a3b8; line-height: 1.6;
+    margin-top: 16px;
+  }
+  .why-box svg { flex-shrink: 0; color: #38bdf8; margin-top: 1px; }
+  .why-box strong { color: #cbd5e1; }
+
+  .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .feature {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 10px; border-radius: 9px; background: rgba(255,255,255,0.02);
+  }
+  .feature svg { color: #38bdf8; flex-shrink: 0; margin-top: 1px; }
+  .feature-name { font-size: 12.5px; font-weight: 600; color: #e2e8f0; }
+  .feature-desc { font-size: 11px; color: #64748b; margin-top: 1px; line-height: 1.4; }
+
+  .done-btn {
+    display: block; width: 100%; margin-top: 8px;
+    background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3);
+    color: #38bdf8; padding: 12px; border-radius: 9px;
+    font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s ease;
+    font-family: inherit;
+  }
+  .done-btn:hover { background: rgba(56,189,248,0.18); border-color: #38bdf8; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <svg class="logo-icon" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 7a2 2 0 0 0-2.45-1.45L16 7V5a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2l4.55 1.45A2 2 0 0 0 23 17V7z"/>
+      </svg>
+      <div>
+        <h1>Welcome</h1>
+        <div class="subtitle">Universal Video Toolkit is installed — one thing to know before it does anything</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">It's off everywhere by default</div>
+      <ol class="step-list">
+        <li><div class="step-text">Go to any site with video, and click the <strong>extension icon</strong> in your toolbar.</div></li>
+        <li><div class="step-text">Toggle <strong>"Enabled on this site"</strong> — or flip <strong>"Enabled everywhere"</strong> if you'd rather it just always run.</div></li>
+        <li><div class="step-text">Hover any video on that site to see the control bar. Drag the pill/bar to reposition it.</div></li>
+      </ol>
+      <div class="why-box">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <div><strong>Why opt-in?</strong> So it only ever does something on sites you've actually chosen, instead of quietly running everywhere. Your site list is remembered — you only do this once per site.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">What's in here</div>
+      <div class="feature-grid">
+        <div class="feature">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <div><div class="feature-name">Speed, seek, loop, rotate</div><div class="feature-desc">Plus fullscreen and cinema mode for sites without their own.</div></div>
+        </div>
+        <div class="feature">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="10" y1="21" x2="10" y2="4"/><line x1="16" y1="21" x2="16" y2="10"/><line x1="20" y1="21" x2="20" y2="16"/></svg>
+          <div><div class="feature-name">Volume boost + 8-band EQ</div><div class="feature-desc">Plus loudness normalization for uneven audio.</div></div>
+        </div>
+        <div class="feature">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3.2"/></svg>
+          <div><div class="feature-name">Screenshots &amp; recording</div><div class="feature-desc">Screenshots copy to clipboard automatically too.</div></div>
+        </div>
+        <div class="feature">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+          <div><div class="feature-name">Usage dashboard</div><div class="feature-desc">Local-only stats — watch time, top sites, feature use.</div></div>
+        </div>
+        <div class="feature">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <div><div class="feature-name">Custom CSS/JS rules</div><div class="feature-desc">Inject your own code per site, with a real code editor.</div></div>
+        </div>
+        <div class="feature">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <div><div class="feature-name">Subtitle injection</div><div class="feature-desc">.srt/.vtt from a file or URL, styling controls included.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="done-btn" id="doneBtn">Got it — close this tab</button>
+  </div>
+  <script>
+    document.getElementById('doneBtn').addEventListener('click', () => window.close());
+  </script>
+</body>
+</html>
