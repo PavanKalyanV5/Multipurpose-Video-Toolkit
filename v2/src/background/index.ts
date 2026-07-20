@@ -120,29 +120,36 @@ chrome.runtime.onMessage.addListener((msg: RuntimeMessage, sender, sendResponse)
     // inherently arbitrary code execution with full page privileges; the
     // rules page warns about that, this handler just does what it's told.
     //
-    // Deliberately NOT `func: (code) => eval(code)`: that calls eval() as
-    // *page* code once injected, which is subject to the page's own CSP —
-    // sites that disallow 'unsafe-eval' (Instagram and most React/webpack
-    // bundled sites do) silently block every rule with zero visible error.
-    // Instead, the Function is constructed here, in the background script's
-    // own context (governed by *our* extension CSP — see manifest.config.ts's
-    // 'unsafe-eval' allowance) — chrome.scripting.executeScript injects a
-    // function by re-parsing its source directly in the target world, which
-    // is exempt from the target page's CSP entirely.
+    // MV3 flatly disallows 'unsafe-eval' in an extension's own CSP — there's
+    // no opt-in, Chrome rejects the manifest outright — so eval()/
+    // new Function() are off the table anywhere in *our* code, background
+    // included. And calling eval() as *page* code (inside the injected
+    // function) is subject to the target page's own CSP, which sites like
+    // Instagram set to disallow 'unsafe-eval' too. The one path left that
+    // needs no eval anywhere: inject a <script> element carrying the code as
+    // plain text. Appending it runs it as a normal inline script — the
+    // static function below that does the appending is itself literal code
+    // (no eval to construct it), so its own injection is exempt from the
+    // page's CSP; only the resulting inline-script execution is still
+    // subject to the page's script-src 'unsafe-inline' (a separate, usually
+    // more permissive, allowance than 'unsafe-eval').
     const tabId = sender.tab ? sender.tab.id! : -1;
     if (tabId !== -1 && typeof msg.code === 'string') {
-      let userFn: () => void;
-      try {
-        userFn = new Function(msg.code) as () => void;
-      } catch (e) {
-        console.error('[Universal Video Toolkit] Custom rule JS failed to parse:', e);
-        return;
-      }
       chrome.scripting
         .executeScript({
           target: { tabId, frameIds: [sender.frameId ?? 0] },
           world: 'MAIN',
-          func: userFn,
+          func: (code: string) => {
+            try {
+              const script = document.createElement('script');
+              script.textContent = code;
+              (document.head || document.documentElement).appendChild(script);
+              script.remove(); // already ran synchronously on insertion; just tidying the DOM
+            } catch (e) {
+              console.error('[Universal Video Toolkit] Custom rule JS error:', e);
+            }
+          },
+          args: [msg.code],
         })
         .catch((e) => console.error('[Universal Video Toolkit] Custom rule JS error:', e));
     }
