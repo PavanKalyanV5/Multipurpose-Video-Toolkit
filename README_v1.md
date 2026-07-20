@@ -98,7 +98,7 @@ graph TB
 ## 3. Core Sub-System Breakdown
 
 ### 3.1 Content Script Orchestrator (`VideoToolkit.js`)
-- **File Path**: [`src/content/VideoToolkit.js`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/src/content/VideoToolkit.js)
+- **File Path**: [`src/content/VideoToolkit.js`](src/content/VideoToolkit.js)
 - **Role**: Central controller managing module instantiation, storage synchronization, keyboard shortcuts (`Shift+S`, `Shift+D`, `Shift+R`, `Shift+E`, etc.), and hover detection.
 - **Key Mechanics**:
   - Checks `chrome.storage.local` key `uvtEnabledSites` and `uvtGlobal`.
@@ -106,21 +106,21 @@ graph TB
   - Maintains `WeakMap` references (`#rotations`, `#rotationObservers`) for video transformations (0°, 90°, 180°, 270°) and protects against host sites attempting to clear custom inline styles.
 
 ### 3.2 DOM Video Scanner & Observer (`VideoScanner.js`)
-- **File Path**: [`src/content/VideoScanner.js`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/src/content/VideoScanner.js)
+- **File Path**: [`src/content/VideoScanner.js`](src/content/VideoScanner.js)
 - **Role**: Continuously detects standard `<video>` elements, iframe-embedded video elements, and shadow-root embedded video elements.
 - **Key Mechanics**:
   - Uses `MutationObserver` on `document.documentElement` to capture dynamically inserted videos (e.g. Single Page Applications like YouTube / TikTok).
   - Handles `mouseEnter` and `mouseLeave` boundaries over target video containers to signal `ToolbarUI.js`.
 
 ### 3.3 Shadow DOM Hover UI (`ToolbarUI.js` & `toolbar.html`)
-- **File Paths**: [`src/content/ToolbarUI.js`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/src/content/ToolbarUI.js), [`src/content/toolbar.html`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/src/content/toolbar.html), [`src/content/toolbar.css`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/src/content/toolbar.css)
+- **File Paths**: [`src/content/ToolbarUI.js`](src/content/ToolbarUI.js), [`src/content/toolbar.html`](src/content/toolbar.html), [`src/content/toolbar.css`](src/content/toolbar.css)
 - **Role**: Renders control overlays (Speed pills, Frame seek buttons, Equalizer popover, Screenshot, Cinema mode trigger, OSD Flash notifications).
 - **Key Mechanics**:
   - Uses an `#shadow-root` open tree to encapsulate all extension styles. Host page CSS framework rules (Tailwind, Bootstrap, reset sheets) **cannot break or bleed into** the control bar UI.
   - Dynamically recalculates position (`top`, `left`, `width`) relative to the active `<video>` bounding client rectangle (`getBoundingClientRect()`).
 
 ### 3.4 Web Audio API Equalizer & Booster (`AudioBooster.js`)
-- **File Path**: [`src/content/AudioBooster.js`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/src/content/AudioBooster.js)
+- **File Path**: [`src/content/AudioBooster.js`](src/content/AudioBooster.js)
 - **Role**: Intercepts HTML5 `<video>` audio output and routes it through an advanced Web Audio API graph.
 - **Key Mechanics**:
   - Creates a `AudioContext` and wraps the video element via `createMediaElementSource(video)`.
@@ -129,7 +129,7 @@ graph TB
   - Provides built-in EQ presets: `Flat`, `Bass Boost`, `Vocal`, `Treble`, `Rock`, `Jazz`.
 
 ### 3.5 Precision A/B Loop Manager (`ABLoopManager.js`)
-- **File Path**: [`src/content/ABLoopManager.js`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/src/content/ABLoopManager.js)
+- **File Path**: [`src/content/ABLoopManager.js`](src/content/ABLoopManager.js)
 - **Role**: Manages high-precision time segment looping.
 - **Key Mechanics**:
   - Binds `timeupdate` listeners to the active video element.
@@ -137,7 +137,7 @@ graph TB
   - Visual markers are injected onto video timeline bars when available.
 
 ### 3.6 Media Recording Engine (`VideoRecorder.js`)
-- **File Path**: [`src/content/VideoRecorder.js`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/src/content/VideoRecorder.js)
+- **File Path**: [`src/content/VideoRecorder.js`](src/content/VideoRecorder.js)
 - **Role**: Screen and canvas recording of live video playback directly to WebM files.
 - **Key Mechanics**:
   - Primary path: Calls `video.captureStream()` or `video.mozCaptureStream()`.
@@ -145,7 +145,7 @@ graph TB
   - Encodes streams using `MediaRecorder` with `video/webm;codecs=vp9` or `vp8`, saving chunks into a Blob and auto-triggering download.
 
 ### 3.7 Background Media Sniffer & Rules Dispatcher (`background.js`)
-- **File Path**: [`background.js`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/background.js)
+- **File Path**: [`background.js`](background.js)
 - **Role**: Service worker running network traffic sniffers and handling extension action messaging.
 - **Key Mechanics**:
   - Binds to `chrome.webRequest.onResponseStarted`. Filters `Content-Type` matching `video/mp4`, `video/webm`, `video/quicktime`.
@@ -154,7 +154,7 @@ graph TB
   - Highlights the extension action badge icon (`●` blue dot) when downloadable media is detected on a tab.
 
 ### 3.8 Custom CSS/JS Site Injector (`injector.js` & `rules.html`)
-- **File Paths**: [`src/rules/injector.js`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/src/rules/injector.js), [`rules.html`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/rules.html)
+- **File Paths**: [`src/rules/injector.js`](src/rules/injector.js), [`rules.html`](rules.html)
 - **Role**: User-script style manager allowing per-domain custom CSS rules and JavaScript snippets.
 - **Key Mechanics**:
   - Runs at `document_start` across all frames.
@@ -162,7 +162,7 @@ graph TB
   - For JavaScript rules, sends `uvt-run-rule-js` message to `background.js`, which executes the code via `chrome.scripting.executeScript({ world: 'MAIN' })`, granting the script direct access to host page JS variables (e.g. `window.player`).
 
 ### 3.9 Usage Analytics Tracker (`StatsTracker.js` & `dashboard.html`)
-- **File Paths**: [`src/content/StatsTracker.js`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/src/content/StatsTracker.js), [`dashboard.html`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/dashboard.html)
+- **File Paths**: [`src/content/StatsTracker.js`](src/content/StatsTracker.js), [`dashboard.html`](dashboard.html)
 - **Role**: Logs local watch time, average speed, and session counts partitioned by website domain into `chrome.storage.local`.
 - **Key Mechanics**:
   - Monitors `play`, `pause`, and `timeupdate` events to compute active watch seconds.

@@ -129,11 +129,11 @@ v2/
 ```
 
 ### 4.1 Vite + CRXJS Build Pipeline
-- **File Paths**: [`v2/vite.config.ts`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/v2/vite.config.ts), [`v2/manifest.config.ts`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/v2/manifest.config.ts)
+- **File Paths**: [`v2/vite.config.ts`](v2/vite.config.ts), [`v2/manifest.config.ts`](v2/manifest.config.ts)
 - **Role**: Automatically parses `manifest.config.ts` to identify entry points (`background`, `content`, `popup`, `pages`) and produces optimal, code-split bundles in `v2/dist/`.
 
 ### 4.2 Reactive UI Store (`UIStore.ts`)
-- **File Path**: [`v2/src/content/UIStore.ts`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/v2/src/content/UIStore.ts)
+- **File Path**: [`v2/src/content/UIStore.ts`](v2/src/content/UIStore.ts)
 - **Role**: Singleton reactive store implementing a lightweight Publish/Subscribe pattern (`subscribe(fn)`, `getState()`, `setState()`).
 - **Key State Subscriptions**:
   - `barSync`: Synchronizes active playback rate, mute status, volume percentage, audio boost state, cinema mode, and fullscreen status across components.
@@ -141,7 +141,7 @@ v2/
   - `pickerState`: Controls the open/closed state and media list array for the video download picker.
 
 ### 4.3 React Content Script & Component Engine (`ToolbarRoot.tsx`)
-- **File Paths**: [`v2/src/content/VideoToolkit.tsx`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/v2/src/content/VideoToolkit.tsx), [`v2/src/content/components/ToolbarRoot.tsx`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/v2/src/content/components/ToolbarRoot.tsx)
+- **File Paths**: [`v2/src/content/VideoToolkit.tsx`](v2/src/content/VideoToolkit.tsx), [`v2/src/content/components/ToolbarRoot.tsx`](v2/src/content/components/ToolbarRoot.tsx)
 - **Role**: Hydrates React components into the host web page inside an isolated Shadow DOM container.
 - **Key Mechanics**:
   - Creates a container `<div>` on `document.body` and calls `attachShadow({ mode: 'open' })`.
@@ -164,7 +164,7 @@ v2/
   - Displays bar charts for daily watch time, pie charts for domain breakdown, and summary cards for average playback speeds and total sessions.
 
 ### 4.6 Network Speed Tracker & DNR Ruleset (`v2/src/content/NetworkTracker.ts` & `v2/public/dnr_rules.json`)
-- **File Paths**: [`v2/src/content/NetworkTracker.ts`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/v2/src/content/NetworkTracker.ts), [`v2/public/dnr_rules.json`](file:///c:/Users/DELL/Downloads/universal-video-toolkit/v2/public/dnr_rules.json)
+- **File Paths**: [`v2/src/content/NetworkTracker.ts`](v2/src/content/NetworkTracker.ts), [`v2/public/dnr_rules.json`](v2/public/dnr_rules.json)
 - **Role**: Tracks Video Consumption Speed vs. Device Receiving Speed in TypeScript.
 - **Key Mechanics**:
   - Incorporates per-chunk active throughput math ($\frac{\text{Bytes}}{\text{Active Fetch Time}}$), TimeRanges-aware buffer progression lookup, and idle-pause persistence.
