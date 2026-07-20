@@ -83,7 +83,12 @@ export class VideoToolkit {
         ['uvtGlobal', 'uvtEnabledSites', 'uvtSpeeds', 'uvtSeekStep', 'uvtAutoplayBlock', 'uvtPauseOffscreen', 'uvtSubtitleStyle'],
         (r) => {
           const enabledSites = r.uvtEnabledSites || [];
-          this.enabled        = r.uvtGlobal === true || enabledSites.includes(this.#site);
+          const isSiteMatch = enabledSites.some(s => {
+            const cs = s.toLowerCase().replace(/^www\./, '');
+            const ch = (this.#site || '').toLowerCase().replace(/^www\./, '');
+            return ch === cs || ch.endsWith('.' + cs);
+          });
+          this.enabled        = r.uvtGlobal === true || isSiteMatch;
           this.seekStep       = r.uvtSeekStep || 5;
           this.autoplayBlock  = r.uvtAutoplayBlock === true;
           this.pauseOffscreen = r.uvtPauseOffscreen === true;
@@ -102,7 +107,12 @@ export class VideoToolkit {
       chrome.storage.local.get(['uvtGlobal', 'uvtEnabledSites'], (r) => {
         const wasEnabled = this.enabled;
         const enabledSites = r.uvtEnabledSites || [];
-        this.enabled = r.uvtGlobal === true || enabledSites.includes(this.#site);
+        const isSiteMatch = enabledSites.some(s => {
+          const cs = s.toLowerCase().replace(/^www\./, '');
+          const ch = (this.#site || '').toLowerCase().replace(/^www\./, '');
+          return ch === cs || ch.endsWith('.' + cs);
+        });
+        this.enabled = r.uvtGlobal === true || isSiteMatch;
 
         if (!this.enabled) {
           if (this.scanner) this.ui.hideAll(); // only if we ever actually mounted anything to hide

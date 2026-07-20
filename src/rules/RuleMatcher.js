@@ -51,9 +51,12 @@ export function splitPatterns(raw) {
  * Left untouched if it already contains a `*` anywhere — that's explicit intent.
  */
 export function normalizePattern(pattern) {
-  if (!pattern || pattern.includes('*')) return pattern;
-  let p = pattern;
-  if (!p.includes('://')) p = '*://' + p; // bare domain/path — match any scheme
+  if (!pattern) return pattern;
+  if (pattern.includes('*')) return pattern;
+  let p = pattern.trim();
+  p = p.replace(/^(https?|ftp|\*):\/\//i, '');
+  p = p.replace(/^www\./i, '');
+  p = '*://*' + p;
   return p.endsWith('/') ? p + '*' : p + '/*';
 }
 

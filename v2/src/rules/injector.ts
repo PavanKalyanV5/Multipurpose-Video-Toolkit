@@ -23,9 +23,12 @@ if (!window.__uvtRulesInjected) {
   // it (https://site.com/ -> https://site.com/*) — see RuleMatcher.ts's
   // normalizePattern() for the canonical version of this.
   const normalizePattern = (pattern: string): string => {
-    if (!pattern || pattern.includes('*')) return pattern;
-    let p = pattern;
-    if (!p.includes('://')) p = '*://' + p;
+    if (!pattern) return pattern;
+    if (pattern.includes('*')) return pattern;
+    let p = pattern.trim();
+    p = p.replace(/^(https?|ftp|\*):\/\//i, '');
+    p = p.replace(/^www\./i, '');
+    p = '*://*' + p;
     return p.endsWith('/') ? p + '*' : p + '/*';
   };
 
